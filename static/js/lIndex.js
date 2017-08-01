@@ -128,25 +128,7 @@
 					alert(id);
 					rt.emit('joinGameS', {roomId: id});
 
-
-
-
-					// $.ajax({
-					// 	type: 'POST',
 					// 	url: '/ajax/joinGame.php',
-					// 	dataType: 'text',
-					// 	data: {roomId: id},
-					// 	success: function(data){
-					// 		if(data == 1){
-					// 			alert(data);
-					// 		}else{
-					// 			alert(data);
-					// 		}
-					// 	}
-					// })
-
-
-
 
 				});
 			}
@@ -238,25 +220,7 @@
 			alert(id);
 			rt.emit('joinGameS', {roomId: id});
 
-
-
-
-			// $.ajax({
-			// 	type: 'POST',
-			// 	url: '/ajax/joinGame.php',
-			// 	dataType: 'text',
-			// 	data: {roomId: id},
-			// 	success: function(data){
-			// 		if(data == 1){
-			// 			alert(data);
-			// 		}else{
-			// 			alert(data);
-			// 		}
-			// 	}
-			// })
-
-
-
+			// 	url: '/ajax/joinGame.php'
 
 		});
 	}
@@ -278,29 +242,6 @@
 
 		rt.emit('CreateRoomS', {countWin: count_win, roomBet: bet});
 
-
-		// $.ajax({
-		// 	type: 'POST',
-		// 	url: '/ajax/CreateRoom.php',
-		// 	dataType: 'text',
-		// 	data: {cv: count_win, br: bet},
-		// 	success: function(data){
-		// 		if(data == '1'){
-		// 			rt.emit('createRoom', {})
-		// 			//add lobbie to front-end
-		// 			// var room = document.createElement('div'),
-
-		// 			// socket send and render
-
-
-		// 		}else if(data == 'Недостаточно средств'){
-		// 			message(data);
-		// 		}else{
-		// 			message(data);
-		// 			gray_block[0].style.display = 'none';
-		// 		}
-		// 	}
-		// })
 	});
 
 
@@ -325,23 +266,8 @@
 	// }
 
 	function delLobbie(){
-		// $.ajax({
-		// 	type: 'POST',
-		// 	url: '/ajax/DeleteRoom.php',
-		// 	dataType: 'text',
-		// 	success: function(data){
-		// 		if(data == '1'){
-		// 			//delete lobbie from front-end
-
-		// 			// socket send and render
-
-
-		// 		}
-		// 	}
-		// })
 		rt.emit('deleteRoomS', {});
 	}
-	// alert(document.getElementsByClassName('del_lobbie')[0]);
 	
 	var textMyMSG = document.getElementById('MyMSG');
 

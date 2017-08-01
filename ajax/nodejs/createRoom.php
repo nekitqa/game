@@ -16,10 +16,10 @@
 	$br = intval($_POST['br']);
 
 	if(mysqli_num_rows($queryR) < 1){
-		if($user['balanсe'] != 0){
-			if($user['balanсe'] >= $_POST['room_bet']){
+		if($user['balance'] != 0){
+			if($user['balance'] >= $_POST['room_bet']){
 				mysqli_query($connection, "INSERT INTO `rooms`(`host`, `image`, `player`, `bet`, `count_win`, `status`) VALUES ('".$user['uid']."','".$user['image']."',0,".$_POST['room_bet'].",".$_POST['count_win'].",'wait')");
-				mysqli_query($connection, "UPDATE `users` SET `balanсe` = `balanсe` - ".$_POST['room_bet']." WHERE `uid` = ".$user['uid']);
+				mysqli_query($connection, "UPDATE `users` SET `balance` = `balance` - ".$_POST['room_bet']." WHERE `uid` = ".$user['uid']);
 				$queryRN = mysqli_query($connection, "SELECT * FROM `rooms` WHERE `host` = '".$user['uid']."' AND `status` = 'wait'");
 				$roomNew = mysqli_fetch_assoc($queryRN);
 				echo json_encode(array('res' => 1, 'data' => array('uid' => $user['uid'], 'id' => $roomNew['id'])));

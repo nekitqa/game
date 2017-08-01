@@ -49,9 +49,10 @@
 
 						var joinJson = JSON.parse(body);
 
-						users.push({socketId: socket.id ,token: sToken, uid: joinJson.uid, image: joinJson.image, lastMsg: new Date().getTime(), spamCount: 0, betRoom: 0});
+						users.push({socketId: socket.id ,token: sToken, uid: joinJson.uid, balance: joinJson.balance, image: joinJson.image, lastMsg: new Date().getTime(), spamCount: 0, betRoom: 0});
 						notJoin.splice(notJoin.findIndex(nj => nj.id == socket.id), 1);
 						socket.join(joinJson.uid);
+						console.log(joinJson);
 
 
 					}
@@ -146,7 +147,12 @@
 								socket.emit('CreateRoomC', {image: item.image, betRoom: data.roomBet, countWin: data.countWin, uidHost: json.data.uid, id: json.data.id});
 								socket.broadcast.emit('CreateRoomC', {image: item.image, betRoom: data.roomBet, countWin: data.countWin, uidHost: json.data.uid, id: json.data.id});
 								socket.emit('balance', {function: '-', number: data.roomBet});
+								socket.to(item.uid).emit('balance', {function: '-', number: data.roomBet});
 								users[users.findIndex(ues => ues.socketId == socket.id)].betRoom = data.roomBet;
+								users[users.findIndex(ues => ues.socketId == socket.id)].balance = parseInt(users[users.findIndex(ues => ues.socketId == socket.id)].balance) - parseInt(data.roomBet);
+					
+								console.log(users[users.findIndex(ues => ues.socketId == socket.id)]);
+
 								rooms.push({idRoom: json.data.id, hostUid: json.data.uid, valueBet: data.roomBet})
 							}else{
 
@@ -181,6 +187,11 @@
 					socket.broadcast.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
 					socket.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
 					socket.emit('balance', {function: '+', number: item.betRoom});
+					socket.to(item.uid).emit('balance', {function: '+', number: item.betRoom});
+					users[users.findIndex(ues => ues.socketId == socket.id)].balance = parseInt(users[users.findIndex(ues => ues.socketId == socket.id)].balance) + parseInt(item.betRoom);
+
+					console.log(users[users.findIndex(ues => ues.socketId == socket.id)]);
+
 					users[users.findIndex(ues => ues.socketId == socket.id)].betRoom = 0;
 					rooms.splice(rooms.findIndex(ros => ros.hostUid == item.uid), 1);
 
@@ -195,7 +206,7 @@
 
 			if(notJoin.findIndex(nj => nj.id == socket.id) == -1){
 
-				console.log(data.id + '\n' + rooms);
+				console.log(data.roomId + '\n' + rooms);
 
 				item = users[users.findIndex(ues => ues.socketId == socket.id)];
 				
@@ -207,6 +218,7 @@
 						// send connect to room   socket.emit();socket.broadcast.emit();
 						// and create private room for players this game
 						// and add string to database
+						socket.emit('msgErrorC', {textError: 'connect'});
 
 					}else{
 

@@ -31,7 +31,7 @@
 					
 					$this->authorize();
 					if($this->connection->query('SELECT * FROM `users` WHERE `uid` = '. $this->token['user_id'])->fetch(PDO::FETCH_ASSOC) == 0){
-						$this->connection->query('INSERT INTO `users`(`uid`, `all`, `win`, `lose`, `balanсe`, `token`) VALUES ('.$this->token['user_id'].', 0, 0, 0, 500, "'.$this->token['access_token'].'")');
+						$this->connection->query('INSERT INTO `users`(`uid`, `all`, `win`, `lose`, `balance`, `token`) VALUES ('.$this->token['user_id'].', 0, 0, 0, 500, "'.$this->token['access_token'].'")');
 					}else{
 						$this->connection->query('UPDATE `users` SET `token` = "'.$this->token['access_token'].'" WHERE `uid` = '.$this->token['user_id']);
 					};

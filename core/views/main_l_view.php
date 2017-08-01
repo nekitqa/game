@@ -30,7 +30,7 @@
 				</div>
 				<span class="win"><?php echo $data['BDInfo']['win'] ?> W</span>
 				<span class="loose"><?php echo $data['BDInfo']['lose'] ?> L</span>
-				<span class="balance"><?php echo $data['BDInfo']['balanсe'] ?></span><span style="color: #978147;">$</span>
+				<span class="balance"><?php echo $data['BDInfo']['balance'] ?></span><span style="color: #978147;">$</span>
 			</div>
 		</header>
 		<div class="content">
