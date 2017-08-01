@@ -1,0 +1,489 @@
+*{
+	margin: 0px;
+	padding: 0px;
+}
+
+html, body{
+	width: 100%;
+	height: 100%;
+}
+
+span{
+	font-family: 'Roboto', black;
+	font-weight: 400;
+	font-size: 16px;
+}
+
+header{
+	height: 80px;
+	width: 100%;
+	background-color: #00B4FF;
+}
+
+.big{
+	font-weight: 600;
+}
+
+.avatar{
+	height: 64px;
+	width: 64px;
+	border-radius: 50%;
+	background-size: cover;
+	float: right;
+	margin: 8px 16px;
+}
+
+#exit{
+	width: 100%;
+	height: 100%;
+	background-image: url('https://cdn0.iconfinder.com/data/icons/web/512/e53-512.png');
+	background-size: cover;
+	border-radius: 50%;
+	opacity: 0.65;
+	display: none;
+	cursor: pointer;
+}
+
+.avatar:hover #exit{
+	display: block;
+}
+
+.avatar:hover{
+	opacity: 0.85;
+}
+
+.information_block{
+	display: inline-block;
+	width: 200px;
+	height: 64px;
+	margin-top: 8px;
+	float: right;
+	text-align: right;
+}
+
+.top_block{
+	display: block;
+	height: 20px;
+	margin-top: 5px;
+}
+
+span.name{
+	font-weight: 350;
+	color: #363636;
+	display: block;
+	float: right;
+}
+
+.win{
+	color: #008406;
+	margin-left: 10px;
+}
+
+.loose{
+	color: red;
+	margin-left: 10px;
+}
+
+.balance{
+	background-image: ;
+	color: #978147;
+	margin-left: 10px;
+}
+
+.lobbie_block{
+	flex-grow: 1;
+	flex-basis: 33%;
+	height: 100%;
+	border-right: 1px solid #00B4FF; 
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.lobbiy{
+	display: inline-block;
+	padding: 5px 10px; 
+	font-size: 20px;
+}
+
+.room{
+	height: 80px;
+	display: flex;
+	border-top:  1px solid #00B4FF; 
+}
+
+
+.avatar_host{
+	min-width: 64px;
+	flex-basis: 64px;
+	height: 64px;
+	border-radius: 50%;
+	margin: 8px 16px;
+	background-size: cover;
+}
+
+.join{
+	min-width: 48px;
+	flex-basis: 48px;
+	height: 48px;
+	border-radius: 50%;
+	margin-top: 24px;
+	background-color: #00B4FF;
+	background-image: url('https://cdn3.iconfinder.com/data/icons/glypho-generic-icons/64/plus-big-512.png');
+	background-size: cover;
+	transform: rotate(0deg); 
+	transition: 0.3s transform;
+	cursor: pointer;
+}
+
+.join:hover{
+	transform: rotate(180deg); 
+	transition: 0.3s transform;
+}
+
+.player{
+	min-width: 48px;
+	flex-basis: 48px;
+	height: 48px;
+	border-radius: 50%;
+	margin-top: 24px;
+	background-color: #00B4FF;
+	display: inline-block;
+	float: left;
+	background-image: url('https://cdn3.iconfinder.com/data/icons/glypho-generic-icons/64/plus-big-512.png');
+	background-size: cover;
+	transform: rotate(0deg); 
+	transition: 0.3s transform;
+	cursor: pointer;
+}
+.del_lobbie{
+	min-width: 48px;
+	flex-basis: 48px;
+	height: 48px;
+	border-radius: 50%;
+	margin-top: 24px;
+	margin-left: 25px;
+	background-color: #00B4FF;
+	display: inline-block;
+	float: left;
+	background-image: url('https://cdn3.iconfinder.com/data/icons/glypho-generic-icons/64/plus-big-512.png');
+	background-size: cover;
+	transform: rotate(45deg); 
+	transition: 0.3s all;
+	cursor: pointer;
+}
+
+.del_lobbie:hover{
+	transform: rotate(315deg); 
+	background-color: #FF0000;
+	transition: 0.3s all;
+}
+.info{
+	width: 200px;
+	height: 40px;
+	margin-top: 24px;
+	text-align: right;
+	display: inline-block;
+	float: left;
+	margin-left: 16px;
+}
+
+.bet{
+	font-size: 20px;
+	font-weight: 600;
+	display: block;
+}
+
+#add_room{
+	width: 24px;
+	height: 24px;
+	background-image: url('https://cdn3.iconfinder.com/data/icons/glypho-generic-icons/64/plus-big-512.png');
+	background-size: cover;
+	background-color: #00B4FF;
+	transform: rotate(0deg); 
+	transition: 0.3s transform;
+	cursor: pointer;
+	display: inline-block;
+	float: right;
+	border-radius: 50%;
+	margin: 5px 10px;
+}
+
+#add_room:hover{
+	transform: rotate(180deg); 
+	transition: 0.3s transform;
+}
+
+/*=========================*/
+
+.gray_block{
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.75);
+	position: absolute;
+	z-index: 100;
+	top: 0px;
+	left: 0px;
+	display: none;
+}
+
+.add_room_block{
+	width: 200px;
+	height: 185px;
+	border-radius: 20px;
+	text-align: center;
+	background-color: #00B4FF;
+	left: calc(50vw - 100px);
+	top: calc(50vh - 75px);
+	position: absolute;
+	z-index: 101;
+}
+
+span.count_win{
+	font-size: 18px;
+	/*margin-top: 15px;*/
+	display: inline-block;
+}
+
+#count_win_input{
+	width: 35px;
+	height: 25px;
+	/*margin-top: 15px;*/
+	font-size: 18px;
+	font-weight: 400;
+	font-family: 'Roboto', Light;
+}
+
+#bet_room{
+	width: 100px;
+	height: 25px;
+	font-size: 18px;
+	font-weight: 400;
+	font-family: 'Roboto', Light;
+}
+
+span.value_bet{
+	font-size: 18px;
+	margin-top: 15px;
+	display: inline-block;
+}
+
+#create_room{
+	width: 170px;
+	height: 48px;
+	font-size: 24px;
+	font-family: 'Roboto', Light;
+	font-weight: 400;
+	border: none;
+	border-radius: 7px;
+	outline: none;
+	cursor: pointer;
+	margin-top: 18px;
+	background-color: #00648D;
+	transition: 0.3s background-color;
+}
+
+#create_room:hover{
+	background-color: #0074A4;
+	transition: 0.3s background-color;
+}
+
+#close_add_room_window{
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+	float: right;
+	transform: rotate(45deg);
+	background-image: url('https://cdn3.iconfinder.com/data/icons/glypho-generic-icons/64/plus-big-512.png');
+	background-size: cover;
+	margin: 5px;
+	cursor: pointer;
+	opacity: 0.5;
+	transition: 0.3s opacity;
+}
+
+
+#close_add_room_window:hover{
+	opacity: 1;
+	transition: 0.3s opacity;
+}	
+
+
+
+
+
+
+
+
+.content{
+	width: 100%;
+	height: calc(100vh - 80px);
+	display: flex;
+}
+
+
+
+
+
+.windowMsg{
+	width: 250px;
+	text-align: center;
+	border-radius: 15px;
+	height: auto;
+	background-color: #00B4FF;
+	left: calc(50vw - 125px);
+	top: calc(50vh - 75px);
+	position: absolute;
+	z-index: 101;
+}
+
+.windowMsg span{
+	padding: 15px 0px;
+	max-width: 230px;
+	display: block;
+}
+
+#closeMsg{
+	width: 24px;
+	height: 24px;
+	display: block;
+	float: right;
+	transform: rotate(45deg);
+	background-image: url('https://cdn3.iconfinder.com/data/icons/glypho-generic-icons/64/plus-big-512.png');
+	background-size: cover;
+	/*margin: 5px;*/
+	cursor: pointer;
+	opacity: 0.5;
+	transition: 0.3s opacity;
+}
+
+
+
+
+
+
+
+
+.chat_block{
+	flex-grow: 2;
+	flex-basis: 67%;
+	height: calc(100vh - 115px);
+	
+	/*background-color: red;*/
+}
+
+
+.chat{
+	display: block;
+	padding: 5px 10px; 
+	font-size: 20px;
+	border-bottom: 1px solid #00B4FF;;
+}
+
+.messages_block{
+	height: 83%;
+	overflow-y: auto;
+}
+
+.messages_block::-webkit-scrollbar {
+    width: 8px;
+    background: rgba(0,0,0,0);
+}
+
+.messages_block::-webkit-scrollbar-thumb {
+    width: 8px;
+}
+
+.message{
+	min-height: 32px;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    padding: 1px;
+    border-bottom: 1px solid #00B4FF;
+}
+
+.message a.avatar{
+    height: 32px;
+    width: 32px;
+    border-radius: 50%;
+    display: inline-block;
+    float: left;
+}
+
+.message span{
+    display: inline-block;
+    max-width: 90%;
+    padding: 13px 2px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.my_msg{
+	height: 17%;
+	background-color: #00B4FF;
+}
+
+.my_msg textarea{
+    resize: none;
+    width: calc(98% - 15px);
+    margin: 1%;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #00B4FF;
+    outline: none;
+}
+
+.preloader{    
+	width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    position: absolute;
+    z-index: 9999;
+    top: 0px;
+    left: 0px;
+    text-align: center;
+}
+
+.spinner{
+	display: inline-block;
+	width: 150px;
+	height: 150px;
+	background: url('../img/spinner.png') center center;
+	-webkit-background-size: contain;
+	background-size: contain;
+	transform-origin: 50% 50%;
+	animation: spinner 5s infinite alternate cubic-bezier(0.57, 0, 0.35, 1);
+	position: absolute;
+	top: calc(50vh - 110px);
+	left: calc(50vw - 75px);
+}
+
+.spinnerO{
+	display: inline-block;
+	width: 150px;
+	height: 150px;
+	background: url('../img/spinnerO.png') center center;
+	-webkit-background-size: contain;
+	background-size: contain;
+	transform-origin: 50% 50%;
+	animation: spinnerO 5s infinite alternate cubic-bezier(0.57, 0, 0.35, 1);
+}
+
+span.spinnerText{
+	display: inline-block;
+    color: white;
+    font-size: 22px;
+    margin-top: calc(50vh + 45px);
+}
+
+@keyframes spinner{
+	100%{
+		transform: rotate(3600deg);
+	}
+}
+
+@keyframes spinnerO{
+	100%{
+		transform: rotate(-3600deg);
+	}
+}
