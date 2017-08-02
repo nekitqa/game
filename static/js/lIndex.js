@@ -1,15 +1,16 @@
-	const HOST = 'http://localhost';
+	const HOSTNODEJS = 'http://localhost';
+	const HOST = 'game';
 
 	var gray_block = document.getElementsByClassName('gray_block');
 
 
 
-	var rt = io.connect(HOST, {secure:true});
+	var rt = io.connect(HOSTNODEJS, {secure:true});
 	var join = false;
+	var preloader = document.getElementsByClassName('preloader')[0];
 
 	rt.on('connect', function(){
 		rt.emit('join', {token: getCookie('token')});
-		var preloader = document.getElementsByClassName('preloader')[0];
 		preloader.style.display = 'none';
 		join = true;
 	})
@@ -125,7 +126,7 @@
 			for (var i = 0; i < joinC.length; i++) {
 				joinC[i].addEventListener('click', function(){
 					var id = this.getAttribute('data-id-room');
-					alert(id);
+					// alert(id);
 					rt.emit('joinGameS', {roomId: id});
 
 					// 	url: '/ajax/joinGame.php',
@@ -138,6 +139,19 @@
 
 
 
+	})
+
+	rt.on('joinGameC', function(data){
+		var spinnerText = document.getElementsByClassName('spinnerText')[0],
+			spinner = document.getElementsByClassName('spinner')[0],
+			spinnerO = document.getElementsByClassName('spinnerO')[0];
+		spinner.style.animation = 'spinner 1.5s infinite alternate cubic-bezier(0.57, 0, 0.35, 1)'
+		spinnerO.style.animation = 'spinner 1.5s infinite alternate cubic-bezier(0.57, 0, 0.35, 1)'
+		spinnerText.innerHTML = 'Подключаюсь!'
+		preloader.style.display = 'block';
+		setTimeout(function(){
+			location.href='http://' + HOST + '/room/' + data.id;
+		}, 1500)
 	})
 
 	rt.on('msgErrorC', function(data){
@@ -217,7 +231,7 @@
 	for (var i = 0; i < joinC.length; i++) {
 		joinC[i].addEventListener('click', function(){
 			var id = this.getAttribute('data-id-room');
-			alert(id);
+			// alert(id);
 			rt.emit('joinGameS', {roomId: id});
 
 			// 	url: '/ajax/joinGame.php'

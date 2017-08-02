@@ -52,7 +52,7 @@
 						users.push({socketId: socket.id ,token: sToken, uid: joinJson.uid, balance: joinJson.balance, image: joinJson.image, lastMsg: new Date().getTime(), spamCount: 0, betRoom: 0});
 						notJoin.splice(notJoin.findIndex(nj => nj.id == socket.id), 1);
 						socket.join(joinJson.uid);
-						console.log(joinJson);
+						// console.log(joinJson);
 
 
 					}
@@ -138,20 +138,28 @@
 
 					if(data.countWin.match(/^\d+$/) != null && data.roomBet.match(/^\d+$/) != null){
 
-						request.post({url: HOST + '/ajax/nodejs/createRoom.php', form: {uid: item.uid, count_win: ecran(data.countWin), room_bet: ecran(data.roomBet)}}, function(err,httpResponse,body){
+						if(parseInt(data.countWin) > 15){
+
+							var countWin = 15;
+
+						}else{
+
+							var countWin = parseInt(data.countWin);
+
+						}
+
+						request.post({url: HOST + '/ajax/nodejs/createRoom.php', form: {uid: item.uid, count_win: countWin, room_bet: data.roomBet}}, function(err,httpResponse,body){
 
 							var json = JSON.parse(body);
 
 							if(json.res == 1){
 
-								socket.emit('CreateRoomC', {image: item.image, betRoom: data.roomBet, countWin: data.countWin, uidHost: json.data.uid, id: json.data.id});
-								socket.broadcast.emit('CreateRoomC', {image: item.image, betRoom: data.roomBet, countWin: data.countWin, uidHost: json.data.uid, id: json.data.id});
+								socket.emit('CreateRoomC', {image: item.image, betRoom: data.roomBet, countWin: countWin, uidHost: json.data.uid, id: json.data.id});
+								socket.broadcast.emit('CreateRoomC', {image: item.image, betRoom: data.roomBet, countWin: countWin, uidHost: json.data.uid, id: json.data.id});
 								socket.emit('balance', {function: '-', number: data.roomBet});
 								socket.to(item.uid).emit('balance', {function: '-', number: data.roomBet});
 								users[users.findIndex(ues => ues.socketId == socket.id)].betRoom = data.roomBet;
 								users[users.findIndex(ues => ues.socketId == socket.id)].balance = parseInt(users[users.findIndex(ues => ues.socketId == socket.id)].balance) - parseInt(data.roomBet);
-					
-								console.log(users[users.findIndex(ues => ues.socketId == socket.id)]);
 
 								rooms.push({idRoom: json.data.id, hostUid: json.data.uid, valueBet: data.roomBet})
 							}else{
@@ -190,8 +198,6 @@
 					socket.to(item.uid).emit('balance', {function: '+', number: item.betRoom});
 					users[users.findIndex(ues => ues.socketId == socket.id)].balance = parseInt(users[users.findIndex(ues => ues.socketId == socket.id)].balance) + parseInt(item.betRoom);
 
-					console.log(users[users.findIndex(ues => ues.socketId == socket.id)]);
-
 					users[users.findIndex(ues => ues.socketId == socket.id)].betRoom = 0;
 					rooms.splice(rooms.findIndex(ros => ros.hostUid == item.uid), 1);
 
@@ -201,34 +207,38 @@
 
 		})
 
-
 		socket.on('joinGameS', function(data){
 
 			if(notJoin.findIndex(nj => nj.id == socket.id) == -1){
 
-				console.log(data.roomId + '\n' + rooms);
-
 				item = users[users.findIndex(ues => ues.socketId == socket.id)];
-				
 
-				if(rooms.findIndex(ros => ros.hostUid == item.uid) == -1){
-					
-					if(rooms.findIndex(ros => ros.idRoom == data.roomId) != -1){
+				if(rooms.findIndex(ros => ros.idRoom == data.roomId) != -1){
 
-						// send connect to room   socket.emit();socket.broadcast.emit();
-						// and create private room for players this game
-						// and add string to database
-						socket.emit('msgErrorC', {textError: 'connect'});
+					request.post({url: HOST + '/ajax/nodejs/joinGame.php', form: {uid: item.uid, bet: rooms[rooms.findIndex(ros => ros.idRoom == data.roomId)].valueBet}}, function(err,httpResponse,body){
 
-					}else{
+						if(body != 1){
 
-						socket.emit('msgErrorC', {textError: 'Вы не успели :('});
+							socket.emit('msgErrorC', {textError: body});
 
-					}
-					// console.log(rooms);
+						}else if(body == 1){
+
+							io.sockets.in(item.uid).emit('joinGameC', {id: data.roomId});
+							io.sockets.in(rooms[rooms.findIndex(ros => ros.idRoom == data.roomId)].hostUid).emit('joinGameC', {id: data.roomId});
+
+							console.log(item.uid);
+							console.log(rooms[rooms.findIndex(ros => ros.idRoom == data.roomId)].hostUid);
+							// send connect to room   socket.emit();socket.broadcast.emit();
+							// and create private room for players this game
+							// and add string to database
+
+						}
+
+					})
+
 				}else{
 
-					socket.emit('msgErrorC', {textError: 'У вас уже есть созданная комната'});
+					socket.emit('msgErrorC', {textError: 'Вы не успели :('});
 
 				}
 
@@ -260,7 +270,6 @@
 					socket.broadcast.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
 					socket.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
 					users[users.findIndex(ues => ues.socketId == socket.id)].betRoom = 0;
-					// socket.emit('deleteRoom', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
 					rooms.splice(rooms.findIndex(ros => ros.hostUid == item.uid), 1);
 							
 				}
