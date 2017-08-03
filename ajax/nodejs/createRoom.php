@@ -7,7 +7,7 @@
 			$queryU = mysqli_query($connection, "SELECT * FROM `users` WHERE `uid` = ".$_POST['uid']."");
 			$user = mysqli_fetch_assoc($queryU); 
 
-			$queryR = mysqli_query($connection, "SELECT * FROM `rooms` WHERE `status` = 'wait' AND `host` = ".$_POST['uid']." OR `status` = 'process' AND `host` = ".$_POST['uid']);
+			$queryR = mysqli_query($connection, "SELECT * FROM `rooms` WHERE `status` = 'wait' AND `host` = ".$_POST['uid']." OR `status` = 'process' AND `host` = ".$_POST['uid']." OR `status` = 'process' AND `player` = ".$_POST['uid']);
 
 
 			// $cv = $_POST['count_win'];
@@ -32,7 +32,7 @@
 					echo json_encode(array('res' => 'Недостаточно средств'));
 				}
 			}else{
-				echo json_encode(array('res' => 'У вас уже есть открытая комната, дождитесь игрока или удалите её и создайте новую'));
+				echo json_encode(array('res' => 'У вас уже есть открытая комната или вы уже находитесь в игре'));
 			}
 
 ?>

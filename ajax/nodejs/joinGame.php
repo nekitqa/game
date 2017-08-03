@@ -16,6 +16,8 @@
 			if($userBalance['balance'] >= $_POST['bet']){
 
 				echo 1;
+				mysqli_query($connection, "UPDATE `rooms` SET `player` = ".$_POST['uid'].", `status` = 'process' WHERE `id` = ".$_POST['id']);
+				mysqli_query($connection, "UPDATE `users` SET `balance` = `balance` - ".$_POST['bet']." WHERE `uid` = ".$_POST['uid']);
 
 			}else{
 

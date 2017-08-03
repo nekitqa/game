@@ -43,7 +43,7 @@
 						?>
 
 					<div class="room" data-id-room="<?php echo $room['id'] ?>">
-						<div class="avatar_host" style="background-image: url(<?php echo $room['image'] ?>);"></div><div class="join" data-id-room="<?php echo $room['id'] ?>"></div><div class="info"><span class="bet">На <?php echo $room['bet'] ?>$</span><span>до <span class="big"><?php echo $room['count_win'] ?></span> побед</span></div>
+						<div class="avatar_host" style="background-image: url(<?php echo $room['image'] ?>);"></div><div class="join" onclick="joinGame(this)" data-id-room="<?php echo $room['id'] ?>"></div><div class="info"><span class="bet">На <?php echo $room['bet'] ?>$</span><span>до <span class="big"><?php echo $room['count_win'] ?></span> побед</span></div>
 					</div>
 
 					<?php }else{

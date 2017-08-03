@@ -78,18 +78,31 @@
 
 							if(item.spamCount < 7){
 
-								if(new Date().getTime() - item.lastMsg < 750){
+								if(new Date().getTime() - item.lastMsg < 1000){
 
 									item.lastMsg = new Date().getTime();
 									item.spamCount++;
-									// socket.emit('chat_error', {text: 'Не так часто!'});
+									if(item.spamCount == 5){
+
+										socket.emit('chat_error', {text: 'Сейчас забаню!'});
+
+									}
 									socket.emit('messageC', {image: item.image, text: ecran(msg.text)});
+									socket.broadcast.emit('messageC', {image: item.image, text: ecran(msg.text)});
 									request.post({url: HOST + '/ajax/nodejs/addMsgToBd.php', form: {token: item.token, text: ecran(msg.text), image: item.image}}, function(err,httpResponse,body){});
 
 								}else{
 
 									item.lastMsg = new Date().getTime();
-									item.spamCount = 0;
+									if(item.spamCount > 0){
+
+										setTimeout(function(){
+
+											item.spamCount = 0;
+
+										}, 10000)
+
+									};
 									request.post({url: HOST + '/ajax/nodejs/addMsgToBd.php', form: {token: item.token, text: ecran(msg.text), image: item.image}}, function(err,httpResponse,body){});
 									socket.emit('messageC', {image: item.image, text: ecran(msg.text)});
 									socket.broadcast.emit('messageC', {image: item.image, text: ecran(msg.text)});
@@ -98,25 +111,26 @@
 
 							}else{
 
+								socket.emit('chat_error', {text: 'Лови бан!'});
 								socket.emit('chat_error', {text: 'Вы заблокированны на 15 минут за спам!'});
 								chatBanned.push(item.uid);
+
+								if('banTimeout' in item != true){
+
+									item.banTimeout = setTimeout(function(){
+
+										chatBanned.splice(chatBanned.indexOf(item.uid), 1);
+										item.spamCount = 0;
+
+									}, 900000)
+
+								}
 
 							}
 
 						}else{
 
 							socket.emit('chat_error', {text: 'Ранее вы были заблокированны на 15 минут за спам!'});
-
-							if('banTimeout' in item != true){
-
-								item.banTimeout = setTimeout(function(){
-
-									chatBanned.splice(chatBanned.indexOf(item.uid), 1);
-									item.spamCount = 0;
-
-								}, 900000)
-
-							}
 
 						}
 
@@ -141,6 +155,10 @@
 						if(parseInt(data.countWin) > 15){
 
 							var countWin = 15;
+
+						}else if(parseInt(data.countWin) < 1){
+
+							var countWin = 1;
 
 						}else{
 
@@ -215,7 +233,7 @@
 
 				if(rooms.findIndex(ros => ros.idRoom == data.roomId) != -1){
 
-					request.post({url: HOST + '/ajax/nodejs/joinGame.php', form: {uid: item.uid, bet: rooms[rooms.findIndex(ros => ros.idRoom == data.roomId)].valueBet}}, function(err,httpResponse,body){
+					request.post({url: HOST + '/ajax/nodejs/joinGame.php', form: {id: data.roomId, uid: item.uid, bet: rooms[rooms.findIndex(ros => ros.idRoom == data.roomId)].valueBet}}, function(err,httpResponse,body){
 
 						if(body != 1){
 
@@ -228,6 +246,7 @@
 
 							console.log(item.uid);
 							console.log(rooms[rooms.findIndex(ros => ros.idRoom == data.roomId)].hostUid);
+							users[users.findIndex(ues => ues.socketId == socket.id)].joinGame = true;
 							// send connect to room   socket.emit();socket.broadcast.emit();
 							// and create private room for players this game
 							// and add string to database
@@ -263,19 +282,31 @@
 			if(notJoin.findIndex(nj => nj.id == socket.id) == -1){
 
 				item = users[users.findIndex(ues => ues.socketId == socket.id)];
-					
-				if(rooms.findIndex(ros => ros.hostUid == item.uid) != -1){
 
-					request.post({url: HOST + '/ajax/nodejs/delLobbie.php', form: {uid: item.uid}}, function(err,httpResponse,body){});
+				if('connectGame' in item != true){
+
+					if(rooms.findIndex(ros => ros.hostUid == item.uid) != -1){
+
+						request.post({url: HOST + '/ajax/nodejs/delLobbie.php', form: {uid: item.uid}}, function(err,httpResponse,body){});
+						socket.broadcast.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
+						// socket.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
+						// users[users.findIndex(ues => ues.socketId == socket.id)].betRoom = 0;
+						rooms.splice(rooms.findIndex(ros => ros.hostUid == item.uid), 1);
+								
+					}
+
+					users.splice(users.findIndex(ues => ues.socketId == socket.id), 1);
+
+
+				}else{
+
 					socket.broadcast.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
 					socket.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
-					users[users.findIndex(ues => ues.socketId == socket.id)].betRoom = 0;
 					rooms.splice(rooms.findIndex(ros => ros.hostUid == item.uid), 1);
-							
+					users.splice(users.findIndex(ues => ues.socketId == socket.id), 1);
+
 				}
-
-				users.splice(users.findIndex(ues => ues.socketId == socket.id), 1);
-
+	
 			}else{
 
 				notJoin.splice(notJoin.findIndex(nj => nj.id == socket.id), 1);

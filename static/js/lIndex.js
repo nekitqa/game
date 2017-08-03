@@ -108,7 +108,7 @@
 			avatarHost.className = 'avatar_host';
 			avatarHost.style.backgroundImage = 'url("' + data.image + '")';	
 			joinBlock.className = 'join';
-			joinBlock.setAttribute('onclick', 'join()');
+			joinBlock.setAttribute('onclick', 'joinGame(this)');
 			joinBlock.setAttribute('data-id-room', data.id);
 			infoBlock.className = 'info';
 			spanBet.className = 'bet';
@@ -122,17 +122,17 @@
 			roomBlock.appendChild(infoBlock);
 			lobbieBlock[0].appendChild(roomBlock);
 
-			var joinC = document.getElementsByClassName('join');
-			for (var i = 0; i < joinC.length; i++) {
-				joinC[i].addEventListener('click', function(){
-					var id = this.getAttribute('data-id-room');
-					// alert(id);
-					rt.emit('joinGameS', {roomId: id});
+			// var joinC = document.getElementsByClassName('join');
+			// for (var i = 0; i < joinC.length; i++) {
+			// 	joinC[i].addEventListener('click', function(){
+			// 		var id = this.getAttribute('data-id-room');
+			// 		// alert(id);
+			// 		rt.emit('joinGameS', {roomId: id});
 
-					// 	url: '/ajax/joinGame.php',
+			// 		// 	url: '/ajax/joinGame.php',
 
-				});
-			}
+			// 	});
+			// }
 
 		}
 		
@@ -176,6 +176,11 @@
 	function getCookie(name){
 		var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g,'\\$1')+"=([^;]*)"));
 		return matches?decodeURIComponent(matches[1]):undefined;
+	}
+
+	function joinGame(e){
+		var id = e.getAttribute('data-id-room');
+		rt.emit('joinGameS', {roomId: id});
 	}
 
 	var block = document.getElementsByClassName("messages_block");
