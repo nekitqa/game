@@ -69,7 +69,16 @@
 			 		if(array_key_exists('id', $routesArray[$out[0][0]]) == true){
 
 			 			$id = $routesArray[$out[0][0]]['id'];
-						$controller = new $controller_name($client_routes[$id]);
+
+			 			if($client_routes[$id] == ''){
+
+							header('Location:'.$host.'404');
+
+			 			}else{
+
+							$controller = new $controller_name($client_routes[$id]);
+
+			 			}
 
 			 		}else{
 

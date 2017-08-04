@@ -171,3 +171,58 @@ footer.score .point{
 	background-size: cover;
 	background-repeat: no-repeat; 
 }
+
+.preloader{    
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    position: absolute;
+    z-index: 9999;
+    top: 0px;
+    left: 0px;
+    text-align: center;
+}
+
+.spinner{
+    display: inline-block;
+    width: 150px;
+    height: 150px;
+    background: url('../img/spinner.png') center center;
+    -webkit-background-size: contain;
+    background-size: contain;
+    transform-origin: 50% 50%;
+    animation: spinner 5s infinite alternate cubic-bezier(0.57, 0, 0.35, 1);
+    position: absolute;
+    top: calc(50vh - 110px);
+    left: calc(50vw - 75px);
+}
+
+.spinnerO{
+    display: inline-block;
+    width: 150px;
+    height: 150px;
+    background: url('../img/spinnerO.png') center center;
+    -webkit-background-size: contain;
+    background-size: contain;
+    transform-origin: 50% 50%;
+    animation: spinnerO 5s infinite alternate cubic-bezier(0.57, 0, 0.35, 1);
+}
+
+span.spinnerText{
+    display: inline-block;
+    color: white;
+    font-size: 22px;
+    margin-top: calc(50vh + 45px);
+}
+
+@keyframes spinner{
+    100%{
+        transform: rotate(3600deg);
+    }
+}
+
+@keyframes spinnerO{
+    100%{
+        transform: rotate(-3600deg);
+    }
+}

@@ -13,7 +13,35 @@
 		
 		function action_index(){		
 			
-			$this->view->generate(null, 'room_view.php', $this->id);
+			if(isset($_COOKIE['token'])){
+
+				$this->model->issetGame();
+
+				if($this->model->issetGame != false){
+
+					if($this->model->idRoom == $this->roomInfo['id']){
+
+						$data = $this->model->get_data();
+
+						$this->view->generate(null, 'room_view.php', $data);
+
+					}else{
+
+						header('Location:'.HOST.'/404');
+
+					}
+
+				}else{
+
+					header('Location:'.HOST.'/404');
+
+				}
+
+			}else{
+
+				header('Location:'.HOST.'/404');
+
+			}
 
 		}
 

@@ -32,6 +32,8 @@
 
 	}, 900000)
 
+	// console.log('start on ');
+
 	io.on('connection', function(socket){
 
 
@@ -39,11 +41,15 @@
 
 		socket.on('join', function(msg){
 
+			// console.log(msg.token);
+
 			if(msg.token != ''){
 
 				var sToken = ecran(msg.token);
 
 				request.post({url: HOST + '/ajax/nodejs/messages.php', form: {token: sToken}}, function(err,httpResponse,body){
+
+					// console.log(body);
 
 					if(body != 0){
 
@@ -65,6 +71,16 @@
 		});
 
 		socket.on('messageS', function(msg){
+
+			console.log(' notJoin - ');
+			console.log(notJoin);
+			console.log('\n');
+			console.log(' users - ');
+			console.log(users);
+			console.log('\n');
+			console.log(' chatBanned - ');
+			console.log(chatBanned);
+			console.log('\n');
 
 			if(notJoin.findIndex(nj => nj.id == socket.id) == -1){
 

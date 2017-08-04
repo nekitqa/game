@@ -31,7 +31,7 @@
 					
 					$this->authorize();
 					if($this->connection->query('SELECT * FROM `users` WHERE `uid` = '. $this->token['user_id'])->fetch(PDO::FETCH_ASSOC) == 0){
-						$this->connection->query('INSERT INTO `users`(`uid`, `all`, `win`, `lose`, `balance`, `token`) VALUES ('.$this->token['user_id'].', 0, 0, 0, 500, "'.$this->token['access_token'].'")');
+						$this->connection->query('INSERT INTO `users`(`uid`, `all`, `win`, `lose`, `balance`, `token`, `name`) VALUES ('.$this->token['user_id'].', 0, 0, 0, 500, "'.$this->token['access_token'].'", "")');
 					}else{
 						$this->connection->query('UPDATE `users` SET `token` = "'.$this->token['access_token'].'" WHERE `uid` = '.$this->token['user_id']);
 					};
@@ -45,8 +45,7 @@
 
 				header("Location: ".HOST);
 
-			}
-			elseif(isset($_COOKIE['token'])){
+			}elseif(isset($_COOKIE['token'])){
 				$this->params = array(
 					'uids' => $_COOKIE['uid'],
 					'fields' => 'uid,first_name,last_name,screen_name,sex,bdate,photo_big',
@@ -54,7 +53,7 @@
 				);
 				$this->userInfo = json_decode(file_get_contents('https://api.vk.com/method/users.get?'.urldecode(http_build_query($this->params))), true);
 				setcookie('image', $this->userInfo['response'][0]['photo_big'], time()+84600);
-				$this->connection->query('UPDATE `users` SET `image` = "'.$this->userInfo['response'][0]['photo_big'].'" WHERE `uid` = '.$_COOKIE['uid']);
+				$this->connection->query('UPDATE `users` SET `name` = "'.$this->userInfo['response'][0]['first_name'].'", `image` = "'.$this->userInfo['response'][0]['photo_big'].'" WHERE `uid` = '.$_COOKIE['uid']);
 				$this->userInfo['BDInfo'] = $this->connection->query('SELECT * FROM `users` WHERE `uid` = '.$_COOKIE['uid'])->fetch(PDO::FETCH_ASSOC);
 				
 				$this->userInfo['Rooms'] = $this->connection->query('SELECT * FROM `rooms` WHERE `status` = "wait" ORDER BY `id` DESC');
@@ -63,7 +62,7 @@
 
 
 				return $this->userInfo;
-			}else{
+			}elseif(!isset($_COOKIE['token'])){
 				return array(
 					'href' => 'http://oauth.vk.com/authorize?client_id='.CLIENTID.'&redirect_uri='.HOST.'&display=page&scope=friends&response_type=code',
 					'arr' => $model_name
@@ -71,14 +70,14 @@
 			}
 		}
 
-		public function auth()
-		{
-			if(isset($_GET['code']) xor isset($_COOKIE['token'])){
-				return 1;
-			}else{
-				return 0;
-			}
-		}
+		// public function auth()
+		// {
+		// 	if(isset($_GET['code']) xor isset($_COOKIE['token'])){
+		// 		return 1;
+		// 	}else{
+		// 		return 0;
+		// 	}
+		// }
 
 		public function authorize()
 		{
