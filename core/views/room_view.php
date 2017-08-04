@@ -46,15 +46,33 @@
 				</div>
 			</main>
 			<footer class="score">
-				<div class="point" id="1" style="background-image: url('https://i.ytimg.com/vi/82PKa1U4VXQ/hqdefault.jpg')"></div>
-				<div class="point" id="2" style="background-image: url('https://i.ytimg.com/vi/82PKa1U4VXQ/hqdefault.jpg')"></div>
-				<div class="point" id="3" style="background-image: url('https://i.ytimg.com/vi/82PKa1U4VXQ/hqdefault.jpg')"></div>
-				<div class="point" id="4" style="background-image: url('https://i.ytimg.com/vi/82PKa1U4VXQ/hqdefault.jpg')"></div>
-				<div class="winner point" id="5" style="background-image: url('https://katushka.org/torrents/00209925/screenshot_1.jpg')"></div>
-				<div class="point" id="6" style="background-image: url('https://katushka.org/torrents/00209925/screenshot_1.jpg')"></div>
-				<div class="point" id="7" style="background-image: url('https://katushka.org/torrents/00209925/screenshot_1.jpg')"></div>
-				<div class="point" id="8" style="background-image: url('https://katushka.org/torrents/00209925/screenshot_1.jpg')"></div>
-				<div class="point" id="9" style="background-image: url('https://katushka.org/torrents/00209925/screenshot_1.jpg')"></div>
+				<?php
+
+					for($i = 1; $i < $data['roomInfo']['count_win'] + 1; $i++){ 
+
+						if($i == intdiv($data['roomInfo']['count_win'], 2) + 1){
+
+							echo '<div class="winner point" id="'.$i.'" style="background-image: url("")"></div>';
+
+						}else{
+
+							echo '<div class="point" id="'.$i.'" style="background-image: url("")"></div>';
+
+						}
+
+
+					}
+
+				?>
+				<!-- <div class="point" id="1" style="background-image: url('')"></div>
+				<div class="point" id="2" style="background-image: url('')"></div>
+				<div class="point" id="3" style="background-image: url('')"></div>
+				<div class="point" id="4" style="background-image: url('')"></div>
+				<div class="winner point" id="5" style="background-image: url('')"></div>
+				<div class="point" id="6" style="background-image: url('')"></div>
+				<div class="point" id="7" style="background-image: url('')"></div>
+				<div class="point" id="8" style="background-image: url('')"></div>
+				<div class="point" id="9" style="background-image: url('')"></div> -->
 			</footer>
 		</div>
 		<script type="text/javascript" src="/static/js/rooms.js"></script>

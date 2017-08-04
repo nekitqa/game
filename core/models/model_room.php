@@ -35,6 +35,7 @@
 			$this->userinfo = $this->connection->query('SELECT * FROM `users` WHERE `token` = "'.$_COOKIE['token'].'"')->fetch(PDO::FETCH_ASSOC);
 			
 			$this->issetGame = $this->connection->query('SELECT * FROM `rooms` WHERE `host` = "'.$this->userinfo['uid'].'" AND `status` = "process" OR `player` = "'.$this->userinfo['uid'].'" AND `status` = "process"');
+			
 
 			if($this->issetGame->rowCount() == 1){
 

@@ -19,7 +19,7 @@
 
 				if($this->model->issetGame != false){
 
-					if($this->model->idRoom == $this->roomInfo['id']){
+					if($this->model->roomInfo['id'] == $this->id){
 
 						$data = $this->model->get_data();
 
