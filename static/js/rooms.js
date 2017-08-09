@@ -51,7 +51,7 @@
 	console.log(idRoom);
 
 	rt.on('connect', function(){
-		rt.emit('joinGame', {token: getCookie('token'), rid: idRoom});
+		rt.emit('joinRoom', {token: getCookie('token'), rid: idRoom});
 		preloader.style.display = 'none';
 		join = true;
 	})
@@ -64,4 +64,46 @@
 
 	rt.on('exitC', function(){
 		location.reload();
+	})
+
+	rt.on('endGame', function(data){
+		console.log(data);
+		if(data.winner = 'host'){
+			var winnerAvatar = document.getElementsByClassName('avatar')[0].style.backgroundImage;
+			var winnerName = document.getElementsByClassName('name')[0].innerHTML;
+		}else{
+			var winnerAvatar = document.getElementsByClassName('avatar')[1].style.backgroundImage;
+			var winnerName = document.getElementsByClassName('name')[1].innerHTML;
+		}
+
+
+		var grayBlock = document.createElement('div'),
+			containerWinner = document.createElement('div'),
+			crownBlock = document.createElement('div'),
+			avatarBlock = document.createElement('div'),
+			nameWinner  = document.createElement('span');
+
+		grayBlock.className = 'gray_block';
+		grayBlock.style.display = 'block';
+		document.body.appendChild(grayBlock);
+
+		containerWinner.className = 'container_winner';
+		grayBlock.appendChild(containerWinner);
+
+		crownBlock.className = 'crown';
+		containerWinner.appendChild(crownBlock);
+
+		avatarBlock.className = 'avatar_winner';
+		avatarBlock.style.backgroundImage = winnerAvatar;
+		containerWinner.appendChild(avatarBlock);
+
+		nameWinner.innerHTML = winnerName;
+		nameWinner.className = 'winner_name';
+		containerWinner.appendChild(nameWinner);
+
+
+		// setTimeout(function(){
+		// 	location.href = 'http://' + HOST;
+		// }, 2500);
+
 	})

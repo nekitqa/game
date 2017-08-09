@@ -14,9 +14,11 @@
 		io 		= require('socket.io')(app);
 
 	var users = [];
+	var users_room = [];
 	var notJoin = [];
 	var chatBanned = [];
 	var rooms = [];
+	var rooms_process = [];
 
 	setInterval(function(){
 
@@ -32,24 +34,17 @@
 
 	}, 900000)
 
-	// console.log('start on ');
-
 	io.on('connection', function(socket){
-
 
 		notJoin.push({id: socket.id});
 
 		socket.on('join', function(msg){
-
-			// console.log(msg.token);
 
 			if(msg.token != ''){
 
 				var sToken = ecran(msg.token);
 
 				request.post({url: HOST + '/ajax/nodejs/messages.php', form: {token: sToken}}, function(err,httpResponse,body){
-
-					// console.log(body);
 
 					if(body != 0){
 
@@ -58,13 +53,10 @@
 						users.push({socketId: socket.id ,token: sToken, uid: joinJson.uid, balance: joinJson.balance, image: joinJson.image, lastMsg: new Date().getTime(), spamCount: 0, betRoom: 0});
 						notJoin.splice(notJoin.findIndex(nj => nj.id == socket.id), 1);
 						socket.join(joinJson.uid);
-						// console.log(joinJson);
-
 
 					}
 
 				});
-
 
 			}
 
@@ -260,9 +252,67 @@
 							io.sockets.in(item.uid).emit('joinGameC', {id: data.roomId});
 							io.sockets.in(rooms[rooms.findIndex(ros => ros.idRoom == data.roomId)].hostUid).emit('joinGameC', {id: data.roomId});
 
-							console.log(item.uid);
-							console.log(rooms[rooms.findIndex(ros => ros.idRoom == data.roomId)].hostUid);
+							var thisRoom = rooms[rooms.findIndex(ros => ros.idRoom == data.roomId)];
 							users[users.findIndex(ues => ues.socketId == socket.id)].joinGame = true;
+							rooms_process.push({idRoom: thisRoom.idRoom, host: thisRoom.hostUid, player: item.uid, f: function(){
+
+								var thisSelf = this;
+								setTimeout(function(){
+
+									// console.log('host - ' + users_room.findIndex(usr => usr.uid == thisSelf.host));
+									// console.log('player - ' + users_room.findIndex(usr => usr.uid == thisSelf.player));
+									// console.log(users_room);
+
+
+									if(users_room.findIndex(usr => usr.uid == thisSelf.host && usr.inRoomId == thisSelf.idRoom) == -1){
+
+										// console.log('not host');
+
+										request.post({url: HOST + '/ajax/nodejs/winnerGame.php', form: {id: thisRoom.idRoom, winner: 'player'}}, function(err,httpResponse,body){
+
+											if(body != '0'){
+
+												// console.log('winner player, body != 0');
+
+												io.sockets.in('room_' + thisSelf.idRoom).emit('endGame', {winner: 'player'});
+
+											}
+
+										});
+
+									}else if(users_room.findIndex(usr => usr.uid == thisSelf.player && usr.inRoomId == thisSelf.idRoom) == -1){
+
+										// console.log('not player');
+
+										request.post({url: HOST + '/ajax/nodejs/winnerGame.php', form: {id: thisRoom.idRoom, winner: 'host'}}, function(err,httpResponse,body){
+
+											if(body != '0'){
+
+												// console.log('winner host, body != 0');
+
+												io.sockets.in('room_' + thisSelf.idRoom).emit('endGame', {winner: 'host'});
+
+											}
+
+										});
+
+									}else if(users_room.findIndex(usr => usr.uid == thisSelf.player) == -1 && users_room.findIndex(usr => usr.uid == thisSelf.host) == -1){
+
+										// console.log('not player and host');
+
+										request.post({url: HOST + '/ajax/nodejs/closeGame.php', form: {id: thisSelf.idRoom}}, function(err,httpResponse,body){});										
+
+									}
+
+								}, 5250)
+
+							}});
+
+							rooms_process[rooms_process.findIndex(ues => ues.idRoom == thisRoom.idRoom)].f();
+							// rooms_process[rooms_process.findIndex(ues => ues.idRoom == thisRoom.idRoom)].timeoutFunc = setTimeout(function(obj){console.log(obj)}, 5500, rooms_process[rooms_process.findIndex(ues => ues.idRoom == thisRoom.idRoom)]);
+							// rooms_process[rooms_process.findIndex(ues => ues.idRoom == thisRoom.idRoom)].qwe = 54;
+							// console.log(rooms_process[rooms_process.findIndex(ues => ues.idRoom == thisRoom.idRoom)].qwe);
+							// rooms_process[rooms_process.findIndex(ues => ues.idRoom == thisRoom.idRoom)].timeout = setTimeout(this.timeoutFunc(), 1000);
 							// send connect to room   socket.emit();socket.broadcast.emit();
 							// and create private room for players this game
 							// and add string to database
@@ -297,32 +347,69 @@
 
 			if(notJoin.findIndex(nj => nj.id == socket.id) == -1){
 
-				item = users[users.findIndex(ues => ues.socketId == socket.id)];
+				item = users[users.findIndex(ues => ues.socketId == socket.id)] || users_room[users_room.findIndex(ues => ues.socketId == socket.id)];
 
-				if('connectGame' in item != true){
+				console.log('================');
+				console.log('item');
+				console.log('================');
+				console.log(item);
 
-					if(rooms.findIndex(ros => ros.hostUid == item.uid) != -1){
+				if('inRoomID' in item == true){
 
-						request.post({url: HOST + '/ajax/nodejs/delLobbie.php', form: {uid: item.uid}}, function(err,httpResponse,body){});
-						socket.broadcast.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
-						// socket.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
-						// users[users.findIndex(ues => ues.socketId == socket.id)].betRoom = 0;
-						rooms.splice(rooms.findIndex(ros => ros.hostUid == item.uid), 1);
-								
+					var thisRoom = rooms_process[rooms_process.findIndex(ros => ros.idRoom == item.inRoomID)];
+
+					console.log('================');
+					console.log('thisRoom');
+					console.log('================');
+					console.log(thisRoom);
+
+					if(thisRoom != undefined){
+
+						if(thisRoom.host == item.uid){
+
+							request.post({url: HOST + '/ajax/nodejs/winnerGame.php', form: {id: thisRoom.idRoom, winner: 'player'}}, function(err,httpResponse,body){});
+							io.sockets.in('room_' + thisRoom.idRoom).emit('endGame', {winner: 'player'});
+
+						}else{
+
+							request.post({url: HOST + '/ajax/nodejs/winnerGame.php', form: {id: thisRoom.idRoom, winner: 'host'}}, function(err,httpResponse,body){});
+							io.sockets.in('room_' + thisRoom.idRoom).emit('endGame', {winner: 'host'});
+
+						}
+
+						rooms_process.splice(rooms_process.findIndex(ros => ros.idRoom == item.inRoomID), 1);
+
+						users_room.splice(users_room.findIndex(ues => ues.socketId == socket.id), 1);
+
 					}
-
-					users.splice(users.findIndex(ues => ues.socketId == socket.id), 1);
-
 
 				}else{
 
-					socket.broadcast.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
-					socket.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
-					rooms.splice(rooms.findIndex(ros => ros.hostUid == item.uid), 1);
-					users.splice(users.findIndex(ues => ues.socketId == socket.id), 1);
+					if('joinGame' in item != true){
 
-				}
+						if(rooms.findIndex(ros => ros.hostUid == item.uid) != -1){
+
+							request.post({url: HOST + '/ajax/nodejs/delLobbie.php', form: {uid: item.uid}}, function(err,httpResponse,body){});
+							socket.broadcast.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
+							// socket.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
+							// users[users.findIndex(ues => ues.socketId == socket.id)].betRoom = 0;
+							rooms.splice(rooms.findIndex(ros => ros.hostUid == item.uid), 1);
+									
+						}
+
+						users.splice(users.findIndex(ues => ues.socketId == socket.id), 1);
+
+					}else{
+
+						// socket.broadcast.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
+						// socket.emit('deleteRoomC', {id: rooms[rooms.findIndex(ros => ros.hostUid == item.uid)].idRoom})
+						// rooms.splice(rooms.findIndex(ros => ros.hostUid == item.uid), 1);
+						users.splice(users.findIndex(ues => ues.socketId == socket.id), 1);
+
+					}
 	
+				}
+				
 			}else{
 
 				notJoin.splice(notJoin.findIndex(nj => nj.id == socket.id), 1);
@@ -330,6 +417,34 @@
 			}
 
 		})
+
+// ===============================    ROOMS    ==============================================
+
+
+	socket.on('joinRoom', function(data){
+
+			if(data.token != '' && data.rid != ''){
+
+				var sToken = ecran(data.token);
+
+				request.post({url: HOST + '/ajax/nodejs/messages.php', form: {token: sToken}}, function(err,httpResponse,body){
+
+					if(body != 0){
+
+						var joinJson = JSON.parse(body);
+
+						users_room.push({socketId: socket.id ,token: sToken, uid: joinJson.uid, inRoomID: data.rid});
+						notJoin.splice(notJoin.findIndex(nj => nj.id == socket.id), 1);
+						socket.join(joinJson.uid);
+						socket.join('room_' + data.rid);
+
+					}
+
+				});
+
+			}
+
+		});
 
 	});
 

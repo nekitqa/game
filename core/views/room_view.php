@@ -8,7 +8,7 @@
 	<body>
 	<?php
 
-		print_r($data);
+		// print_r($data);
 
 	?>	
 		<div class="preloader">
