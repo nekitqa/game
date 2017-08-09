@@ -19,9 +19,9 @@
 		</div>
 		<div class="container">
 			<header class="menu">
-				<button class="stone" onclick=""></button>
-				<button class="paper" onclick=""></button>
-				<button class="scissors" onclick=""></button>
+				<button class="stone" onclick="stone()"></button>
+				<button class="scissors" onclick="scissors()"></button>
+				<button class="paper" onclick="paper()"></button>
 			</header>
 			<main class="field">
 				<div class="player">

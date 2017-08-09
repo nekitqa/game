@@ -1,7 +1,12 @@
 	const HOSTNODEJS = 'http://localhost';
 	const HOST = 'game';
-
-
+	var rt = io.connect(HOSTNODEJS, {secure:true});
+	var join = false;
+	var preloader = document.getElementsByClassName('preloader')[0];
+	var idRoom = location.href.replace('http://' + HOST + '/room/', '');
+	var timer = document.getElementsByClassName('time')[0];
+	var iInterval = 0;
+	var timerInterval;
 
 
 	function getCookie(name){
@@ -35,7 +40,17 @@
 
 	}
 
+	function stone(){
+		rt.emit('strokeGame', {item: 1});
+	}
 
+	function scissors(){
+		rt.emit('strokeGame', {item: 2});
+	}
+
+	function paper(){
+		rt.emit('strokeGame', {item: 3});
+	}
 
 
 	function deleteCookie(name){
@@ -43,16 +58,21 @@
 	  	date.setTime(date.getTime() - 1); // Возвращаемся в "прошлое"
 	  	document.cookie = name += "=; expires=" + date.toGMTString();
 	}
+		
+	function startTimer(countS){
+		timer.innerHTML = countS + ' сек';
+			timerInterval = setInterval(function(){
+			timer.innerHTML = countS + ' сек';
+			if(countS == 0){
+			}else{
+				countS--;
+			}
+		}, 1000)
+	}
 
-	var rt = io.connect(HOSTNODEJS, {secure:true});
-	var join = false;
-	var preloader = document.getElementsByClassName('preloader')[0];
-	var idRoom = location.href.replace('http://' + HOST + '/room/', '');
-	console.log(idRoom);
 
 	rt.on('connect', function(){
 		rt.emit('joinRoom', {token: getCookie('token'), rid: idRoom});
-		preloader.style.display = 'none';
 		join = true;
 	})
 
@@ -66,44 +86,66 @@
 		location.reload();
 	})
 
+	rt.on('msgErrorC', function(data){
+		message(data.textError);
+	})
+
+	rt.on('startGame', function(){
+		// ставим для карт дефолтные рубашки
+		if(preloader.style.display != 'none'){
+			preloader.style.display = 'none';
+		};
+		startTimer(10);
+	})
+
+	rt.on('endRound', function(data){
+		// ставим нужные нам рубашки
+		clearInterval(timerInterval);
+	})
+
 	rt.on('endGame', function(data){
-		console.log(data);
-		if(data.winner = 'host'){
-			var winnerAvatar = document.getElementsByClassName('avatar')[0].style.backgroundImage;
-			var winnerName = document.getElementsByClassName('name')[0].innerHTML;
+		console.log(data.winner);
+		if(data.winner == 'none'){
+			// location.href = 'http://' + HOST;
+			console.log('winner: none');
 		}else{
-			var winnerAvatar = document.getElementsByClassName('avatar')[1].style.backgroundImage;
-			var winnerName = document.getElementsByClassName('name')[1].innerHTML;
+			if(data.winner == 'host'){
+				var winnerAvatar = document.getElementsByClassName('avatar')[0].style.backgroundImage;
+				var winnerName = document.getElementsByClassName('name')[0].innerHTML;
+			}else if(data.winner == 'player'){
+				var winnerAvatar = document.getElementsByClassName('avatar')[1].style.backgroundImage;
+				var winnerName = document.getElementsByClassName('name')[1].innerHTML;
+			}
+
+
+			var grayBlock = document.createElement('div'),
+				containerWinner = document.createElement('div'),
+				crownBlock = document.createElement('div'),
+				avatarBlock = document.createElement('div'),
+				nameWinner  = document.createElement('span');
+
+			grayBlock.className = 'gray_block';
+			grayBlock.style.display = 'block';
+			document.body.appendChild(grayBlock);
+
+			containerWinner.className = 'container_winner';
+			grayBlock.appendChild(containerWinner);
+
+			crownBlock.className = 'crown';
+			containerWinner.appendChild(crownBlock);
+
+			avatarBlock.className = 'avatar_winner';
+			avatarBlock.style.backgroundImage = winnerAvatar;
+			containerWinner.appendChild(avatarBlock);
+
+			nameWinner.innerHTML = winnerName;
+			nameWinner.className = 'winner_name';
+			containerWinner.appendChild(nameWinner);
+
+
+			// setTimeout(function(){
+			// 	location.href = 'http://' + HOST;
+			// }, 2500);
 		}
-
-
-		var grayBlock = document.createElement('div'),
-			containerWinner = document.createElement('div'),
-			crownBlock = document.createElement('div'),
-			avatarBlock = document.createElement('div'),
-			nameWinner  = document.createElement('span');
-
-		grayBlock.className = 'gray_block';
-		grayBlock.style.display = 'block';
-		document.body.appendChild(grayBlock);
-
-		containerWinner.className = 'container_winner';
-		grayBlock.appendChild(containerWinner);
-
-		crownBlock.className = 'crown';
-		containerWinner.appendChild(crownBlock);
-
-		avatarBlock.className = 'avatar_winner';
-		avatarBlock.style.backgroundImage = winnerAvatar;
-		containerWinner.appendChild(avatarBlock);
-
-		nameWinner.innerHTML = winnerName;
-		nameWinner.className = 'winner_name';
-		containerWinner.appendChild(nameWinner);
-
-
-		// setTimeout(function(){
-		// 	location.href = 'http://' + HOST;
-		// }, 2500);
 
 	})
