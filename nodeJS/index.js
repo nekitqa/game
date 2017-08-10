@@ -131,6 +131,8 @@
 
 									}, 900000)
 
+									console.log(chatBanned);
+
 								}
 
 							}
@@ -379,7 +381,6 @@
 									if(rooms_process[rooms_process.findIndex(rps => rps.id == This.id)].scorePlayer != rooms_process[rooms_process.findIndex(rps => rps.id == This.id)].countWin && rooms_process[rooms_process.findIndex(rps => rps.id == This.id)].scoreHost != rooms_process[rooms_process.findIndex(rps => rps.id == This.id)].countWin){
 
 
-
 											This.startGame();
 
 									}else if(rooms_process[rooms_process.findIndex(rps => rps.id == This.id)].scorePlayer == rooms_process[rooms_process.findIndex(rps => rps.id == This.id)].countWin){
@@ -426,13 +427,19 @@
 
 								var This = this;
 
-								This.timeoutFunc = setTimeout(function(obj){
+								This.timeoutFunc2sec = setTimeout(function(object){
 
-									This.findWinner();
+									This.timeoutFunc = setTimeout(function(obj){
 
-								}, 11000, This);
+										This.findWinner();
 
-								io.sockets.in('room_' + This.id).emit('startGame', {});
+									}, 11000, This);
+
+									io.sockets.in('room_' + This.id).emit('startGame', {});
+
+								}, 2000)
+
+									
 
 								console.log('startgame()');
 
@@ -682,49 +689,55 @@
 		socket.on('strokeGame', function(data){
 
 			item = users_room[users_room.findIndex(ues => ues.socketId == socket.id)];
-			itemRoom = rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)];
+			if(rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)] != -1){
 
-			if(item.uid == itemRoom.host){
+				itemRoom = rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)];
 
-				if(rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].strokeHost == 0){
+				if(item.uid == itemRoom.host){
 
-					rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].strokeHost = data.item;
+					if(rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].strokeHost == 0){
 
-					// send in room replace card host
+						rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].strokeHost = data.item;
 
-					if(rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].strokePlayer != 0){
+						// send in room replace card host
+						io.sockets.in('room_' + itemRoom.id).emit('stroke', {who: 'host'});
 
-						rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].findWinner();
+						if(rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].strokePlayer != 0){
 
-						console.log('player - ' + rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].scorePlayer + ':' + rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].scoreHost + ' - host');
+							rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].findWinner();
+
+							console.log('player - ' + rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].scorePlayer + ':' + rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].scoreHost + ' - host');
+
+						}
+
+					}else{
+
+						socket.emit('msgErrorC', {textError: 'Вы уже сходили!'});
 
 					}
 
-				}else{
+				}else if(item.uid == itemRoom.player){
 
-					socket.emit('msgErrorC', {textError: 'Вы уже сходили!'});
+					if(rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].strokePlayer == 0){
 
-				}
+						rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].strokePlayer = data.item;
 
-			}else if(item.uid == itemRoom.player){
+						// send in room replace card player
+						io.sockets.in('room_' + itemRoom.id).emit('stroke', {who: 'player'});
 
-				if(rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].strokePlayer == 0){
+						if(rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].strokeHost != 0){
 
-					rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].strokePlayer = data.item;
+							rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].findWinner();
 
-					// send in room replace card player
+							console.log('player - ' + rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].scorePlayer + ':' + rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].scoreHost + ' - host');
 
-					if(rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].strokeHost != 0){
+						}	
 
-						rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].findWinner();
+					}else{
 
-						console.log('player - ' + rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].scorePlayer + ':' + rooms_process[rooms_process.findIndex(rps => rps.id == item.inRoomID)].scoreHost + ' - host');
+						socket.emit('msgErrorC', {textError: 'Вы уже сходили!'});
 
-					}	
-
-				}else{
-
-					socket.emit('msgErrorC', {textError: 'Вы уже сходили!'});
+					}
 
 				}
 

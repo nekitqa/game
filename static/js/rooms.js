@@ -7,7 +7,26 @@
 	var timer = document.getElementsByClassName('time')[0];
 	var iInterval = 0;
 	var timerInterval;
+	var cardHost = document.getElementsByClassName('card')[0];
+	var cardPlayer = document.getElementsByClassName('card')[1];
+	var buttons = document.getElementsByClassName('buttons');
+	buttonsOnclickArr = ['stone()', 'scissors()', 'paper()'];
 
+	function deactivateButtons(){
+		for (var i = 0; i < buttons.length; i++) {
+			buttons[i].setAttribute('onclick', '');
+			buttons[i].style.opacity = '0.5';
+		}	
+	}
+
+	function activateButtons(){
+		for (var i = 0; i < buttons.length; i++) {
+			buttons[i].setAttribute('onclick', buttonsOnclickArr[i]);
+			buttons[i].style.opacity = '1';
+		}	
+	}
+	
+	activateButtons();
 
 	function getCookie(name){
 		var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g,'\\$1')+"=([^;]*)"));
@@ -42,14 +61,17 @@
 
 	function stone(){
 		rt.emit('strokeGame', {item: 1});
+		deactivateButtons();
 	}
 
 	function scissors(){
 		rt.emit('strokeGame', {item: 2});
+		deactivateButtons();
 	}
 
 	function paper(){
 		rt.emit('strokeGame', {item: 3});
+		deactivateButtons();
 	}
 
 
@@ -92,6 +114,9 @@
 
 	rt.on('startGame', function(){
 		// ставим для карт дефолтные рубашки
+		cardPlayer.style.backgroundImage = 'url(/static/img/defCard.png)';
+		cardHost.style.backgroundImage = 'url(/static/img/defCard.png)';
+		activateButtons();
 		if(preloader.style.display != 'none'){
 			preloader.style.display = 'none';
 		};
@@ -100,14 +125,58 @@
 
 	rt.on('endRound', function(data){
 		// ставим нужные нам рубашки
+		console.log(data);
+
+		if(data.hostStroke == 1){
+
+			cardHost.style.backgroundImage = 'url(/static/img/stone.png)';
+			console.log('host stone');
+
+		}else if(data.hostStroke == 2){
+
+			cardHost.style.backgroundImage = 'url(/static/img/scissors.png)';
+			console.log('host scissors');
+
+		}else if(data.hostStroke == 3){
+
+			cardHost.style.backgroundImage = 'url(/static/img/paper.png)';
+			console.log('host paper');
+
+		}
+
+		if(data.playerStroke == 1){
+
+			cardPlayer.style.backgroundImage = 'url(/static/img/stone.png)';
+			console.log('player stone');
+
+		}else if(data.playerStroke == 2){
+
+			cardPlayer.style.backgroundImage = 'url(/static/img/scissors.png)';
+			console.log('player scissors');
+
+		}else if(data.playerStroke == 3){
+
+			cardPlayer.style.backgroundImage = 'url(/static/img/paper.png)';
+			console.log('player paper');
+
+		}
+
 		clearInterval(timerInterval);
 	})
+
+	rt.on('stroke', function(data){
+		if(data.who == 'host'){
+			cardHost.style.backgroundImage = 'url(/static/img/waitCard.png)';
+		}else if(data.who == 'player'){
+			cardPlayer.style.backgroundImage = 'url(/static/img/waitCard.png)';
+		}
+	});
 
 	rt.on('endGame', function(data){
 		console.log(data.winner);
 		if(data.winner == 'none'){
-			// location.href = 'http://' + HOST;
-			console.log('winner: none');
+			location.href = 'http://' + HOST;
+			// console.log('winner: none');
 		}else{
 			if(data.winner == 'host'){
 				var winnerAvatar = document.getElementsByClassName('avatar')[0].style.backgroundImage;
@@ -143,9 +212,9 @@
 			containerWinner.appendChild(nameWinner);
 
 
-			// setTimeout(function(){
-			// 	location.href = 'http://' + HOST;
-			// }, 2500);
+			setTimeout(function(){
+				location.href = 'http://' + HOST;
+			}, 2500);
 		}
 
 	})
